@@ -4,19 +4,13 @@ import { Actor, Passive } from "./internal";
 export abstract class Stat {
   constructor(
     public readonly name: string, // keyof Stats (?)
-    actor: Actor,
+    public actor: Actor,
     public readonly expressions: StatExpression[]
   ) {
-    this.setActor(actor);
     this.expressions = Stat.defaultExpressions.concat(this.expressions);
   }
 
   @observable baseValue = 0;
-  @observable actor: Actor = undefined;
-
-  @action setActor(actor: Actor) {
-    this.actor = actor;
-  }
 
   @computed get value() {
     trace();
