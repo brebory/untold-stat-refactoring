@@ -1,10 +1,10 @@
-import { Stat, StatExpression } from "./internal";
+import { Stat, ExpressionOptions } from "./internal";
 
 export class Derivative extends Stat {
   constructor(
     name: string,
     actor,
-    expressions: StatExpression<Derivative>[] = []
+    expressions: ExpressionOptions<Derivative> = {}
   ) {
     super(name, actor, expressions);
   }
