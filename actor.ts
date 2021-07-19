@@ -1,37 +1,18 @@
 import { observable, action, computed } from "mobx";
 
-import { Attribute, Derivative } from "./internal";
+import { Attribute, Derivative, Item } from "./internal";
 
 export class Actor {
-  // Simplified version of the inventory
-  @observable items = [
-    {
-      sideEffects: {
-        passives: [
-          {
-            property: "strength",
-            value: 2,
-            type: "factor"
-          }
-        ]
-      }
-    },
-    {
-      sideEffects: {
-        passives: [
-          {
-            property: "strength",
-            value: 5,
-            type: "term"
-          }
-        ]
-      }
-    }
-  ];
+  
+  @observable items: Item[] = [];
 
   @computed get passives() {
     return this.items.reduce((passives, item) => {
-      if (item.sideEffects.passives && item.sideEffects.passives.length > 0) {
+      if (
+        item.sideEffects &&
+        item.sideEffects.passives &&
+        item.sideEffects.passives.length > 0
+      ) {
         passives.push(...item.sideEffects.passives);
       }
 
@@ -44,7 +25,7 @@ export class Actor {
   };
 
   attributes = {
-    strength: new Attribute("strength", this, 4),
+    strength: new Attribute("strength", this),
     charisma: new Attribute("charisma", this),
     resilience: new Attribute("resilience", this),
     agility: new Attribute("agility", this),
@@ -64,6 +45,51 @@ export class Actor {
       (_, derivative) => derivative.actor.attributes.resilience.value,
       (value, _) => value / 10,
       (value, _) => Math.min(value, 0.8)
+    ]),
+    armorEncumbrance: new Derivative("armorEncumbrance", this, [
+      (_, derivative) =>
+        derivative.actor.items
+          .filter(Actor.isItemArmorType)
+          .reduce(Actor.encumbranceFromItems, 0)
+    ]),
+    weaponEncumbrance: new Derivative("weaponEncumbrance", this, [
+      (_, derivative) =>
+        derivative.actor.items
+          .filter(Actor.isItemWeaponType)
+          .reduce(Actor.encumbranceFromItems, 0)
+    ]),
+    weaponEfficiency: new Derivative("weaponEfficiency", this, [
+      (_, derivative) => {
+        const {
+          weaponEncumbrance,
+          armorEncumbrance
+        } = derivative.actor.derivatives;
+        const { strength } = derivative.actor.attributes;
+
+        const weaponValue = weaponEncumbrance.value;
+        const armorValue = armorEncumbrance.value;
+        const strengthValue = strength.value;
+
+        if (weaponValue > 0 || armorValue > 0) {
+          return (2 + strengthValue) / (weaponValue + armorValue / 4);
+        } else {
+          return 1;
+        }
+      },
+      (value, _) => Math.min(value, 1)
+    ]),
+    attackSpeed: new Derivative("attackSpeed", this, [
+      (_, derivative) => 1.1 + derivative.actor.attributes.agility.value / 6,
+      (value, derivative) =>
+        value * derivative.actor.derivatives.weaponEfficiency.value,
+      (value, _) => Math.max(value, 0)
     ])
   };
+
+  static armorItemTypes = ["armor", "shield"];
+  static weaponItemTypes = ["weapon"];
+  static isItemArmorType = (item) => Actor.armorItemTypes.includes(item.type);
+  static isItemWeaponType = (item) => Actor.weaponItemTypes.includes(item.type);
+  static encumbranceFromItems = (total, item) =>
+    total + (item.encumbrance || 0);
 }
