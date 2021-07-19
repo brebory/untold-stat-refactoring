@@ -1,4 +1,4 @@
-import { action, computed, observable, trace } from "mobx";
+import { computed, observable, trace } from "mobx";
 import { Actor, Passive } from "./internal";
 
 export abstract class Stat {
@@ -7,7 +7,9 @@ export abstract class Stat {
     public actor: Actor,
     public readonly expressions: StatExpression[]
   ) {
-    this.expressions = Stat.defaultExpressions.concat(this.expressions);
+    this.expressions = Stat.preExpressions
+      .concat(this.expressions)
+      .concat(Stat.postExpressions);
   }
 
   @observable baseValue = 0;
@@ -15,12 +17,12 @@ export abstract class Stat {
   @computed get value() {
     trace();
 
-    const expressions = this.expressions.reduce(
+    const value = this.expressions.reduce(
       (value, expression) => expression(value, this),
       this.baseValue
     );
 
-    return expressions;
+    return value;
   }
 
   @computed get filteredPassives(): Passive[] {
@@ -29,7 +31,11 @@ export abstract class Stat {
     );
   }
 
-  static get defaultExpressions(): StatExpression<Stat>[] {
+  static get preExpressions(): StatExpression<Stat>[] {
+    return [];
+  }
+
+  static get postExpressions(): StatExpression<Stat>[] {
     return [
       // Term passives
       (value: number, stat: Stat) =>

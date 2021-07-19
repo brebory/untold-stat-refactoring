@@ -9,7 +9,8 @@
     "allowJs": true,
     "lib": [
       "es6",
-      "dom"
+      "dom",
+      "ES2016.Array.Include"
     ],
     "rootDir": "src",
     "moduleResolution": "node"
