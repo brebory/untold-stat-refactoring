@@ -1,15 +1,25 @@
 import { action } from "mobx";
 
-import { Actor, Stat, StatExpression } from "./internal";
+import { Actor, Stat, ExpressionOptions } from "./internal";
 
 export class Attribute extends Stat {
   constructor(
     name: string,
     actor: Actor,
     baseValue: number = 1,
-    expressions: StatExpression<Attribute>[] = []
+    expressionOptions: ExpressionOptions<Attribute> = {}
   ) {
-    super(name, actor, expressions.concat(Attribute.defaultExpressions));
+    super(name, actor, {
+      preExpressions: (expressionOptions.preExpressions || []).concat(
+        Attribute.defaultOptions.preExpressions
+      ),
+      expressions: (expressionOptions.expressions || []).concat(
+        Attribute.defaultOptions.expressions
+      ),
+      postExpressions: (expressionOptions.postExpressions || []).concat(
+        Attribute.defaultOptions.postExpressions
+      )
+    });
     this.setBaseValue(baseValue);
   }
 
@@ -17,12 +27,16 @@ export class Attribute extends Stat {
 
   @action setBaseValue = (value) => (this.baseValue = value);
 
-  static get defaultExpressions(): StatExpression<Attribute>[] {
-    return [
-      // Floor
-      (value: number, _) => Math.floor(value),
-      // Clamp to 1
-      (value: number, _) => Math.max(value, 1)
-    ];
+  static get defaultOptions(): ExpressionOptions<Attribute> {
+    return {
+      preExpressions: [],
+      expressions: [],
+      postExpressions: [
+        // Floor
+        (value: number, _) => Math.floor(value),
+        // Clamp to 1
+        (value: number, _) => Math.max(value, 1)
+      ]
+    };
   }
 }

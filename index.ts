@@ -99,7 +99,27 @@ console.log("Equipping cursed Encumbrance ring");
 person.equipItem({
   type: "accessory",
   sideEffects: {
-    passives: [{ property: "armorEncumbrance", value: 2.0, type: "factor" }]
+    passives: [
+      { property: "armorEncumbrance", value: 2.0, type: "factor" },
+      { property: "weaponEncumbrance", value: 2.0, type: "factor" }
+    ]
+  }
+});
+
+console.log("###########################################");
+console.log("Equipping Havel's ring");
+
+// There was a bug with the ordering of expressions.
+// Previously, weaponEfficiency was able to exceed 1
+// Fixed by adding the ability to pass pre/post expressions
+// to the base Stat class
+// Order:
+// child pre expressions -> Stat pre expressions => child expressions => Stat post expressions => child post expressions
+
+person.equipItem({
+  type: "accessory",
+  sideEffects: {
+    passives: [{ property: "weaponEfficiency", value: 3.0, type: "factor" }]
   }
 });
 

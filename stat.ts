@@ -5,12 +5,16 @@ export abstract class Stat {
   constructor(
     public readonly name: string, // keyof Stats (?)
     public actor: Actor,
-    public readonly expressions: StatExpression[]
+    expressionOptions: ExpressionOptions = {}
   ) {
-    this.expressions = Stat.preExpressions
-      .concat(this.expressions)
-      .concat(Stat.postExpressions);
+    this.expressions = (expressionOptions.preExpressions || [])
+      .concat(Stat.preExpressions)
+      .concat(expressionOptions.expressions || [])
+      .concat(Stat.postExpressions)
+      .concat(expressionOptions.postExpressions || []);
   }
+
+  public readonly expressions: StatExpression[];
 
   @observable baseValue = 0;
 
@@ -56,3 +60,9 @@ export type StatExpression<StatContext extends Stat = any> = (
   value: number,
   context: StatContext
 ) => number;
+
+export type ExpressionOptions<StatContext extends Stat = any> = {
+  preExpressions?: StatExpression<StatContext>[];
+  expressions?: StatExpression<StatContext>[];
+  postExpressions?: StatExpression<StatContext>[];
+};
