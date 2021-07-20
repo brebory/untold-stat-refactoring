@@ -28,14 +28,14 @@ for (let derivative of Object.values(person.derivatives)) {
 
 // Alter values and see if everything is updated as expected
 console.log("###########################################");
-console.log("Increasing Strength, Resilience, and Agility");
+console.log("Increasing Strength +1, Resilience +1, and Agility +1");
 
 person.attributes.strength.increaseBaseValue();
 person.attributes.resilience.increaseBaseValue();
 person.attributes.agility.increaseBaseValue();
 
 console.log("###########################################");
-console.log("Equipping Heavy Weapon");
+console.log("Equipping Heavy Weapon (WENC +10)");
 
 person.equipItem({
   type: "weapon",
@@ -43,14 +43,14 @@ person.equipItem({
 });
 
 console.log("###########################################");
-console.log("Equipping Strength Doubling ring");
+console.log("Equipping Strength Doubling Ring (STR x2)");
 
 person.equipItem({
   type: "accessory",
   sideEffects: {
-    passives: [
+    statModifiers: [
       {
-        property: "strength",
+        statName: "strength",
         value: 2,
         type: "factor"
       }
@@ -59,14 +59,14 @@ person.equipItem({
 });
 
 console.log("###########################################");
-console.log("Equipping Giant's Belt");
+console.log("Equipping Giant's Belt (STR +3)");
 
 person.equipItem({
   type: "accessory",
   sideEffects: {
-    passives: [
+    statModifiers: [
       {
-        property: "strength",
+        statName: "strength",
         value: 3,
         type: "term"
       }
@@ -75,7 +75,7 @@ person.equipItem({
 });
 
 console.log("###########################################");
-console.log("Equipping Heavy Armor");
+console.log("Equipping Heavy Armor (AENC +10)");
 
 person.equipItem({
   type: "armor",
@@ -84,30 +84,30 @@ person.equipItem({
 });
 
 console.log("###########################################");
-console.log("Equipping Resilience ring");
+console.log("Equipping Resilience Ring (RES +1)");
 
 person.equipItem({
   type: "accessory",
   sideEffects: {
-    passives: [{ property: "resilience", value: 1, type: "term" }]
+    statModifiers: [{ statName: "resilience", value: 1, type: "term" }]
   }
 });
 
 console.log("###########################################");
-console.log("Equipping cursed Encumbrance ring");
+console.log("Equipping Cursed Encumbrance Ring (ENC x2)");
 
 person.equipItem({
   type: "accessory",
   sideEffects: {
-    passives: [
-      { property: "armorEncumbrance", value: 2.0, type: "factor" },
-      { property: "weaponEncumbrance", value: 2.0, type: "factor" }
+    statModifiers: [
+      { statName: "armorEncumbrance", value: 2.0, type: "factor" },
+      { statName: "weaponEncumbrance", value: 2.0, type: "factor" }
     ]
   }
 });
 
 console.log("###########################################");
-console.log("Equipping Havel's ring");
+console.log("Equipping Havel's Ring (WEF x3)");
 
 // There was a bug with the ordering of expressions.
 // Previously, weaponEfficiency was able to exceed 1
@@ -119,7 +119,9 @@ console.log("Equipping Havel's ring");
 person.equipItem({
   type: "accessory",
   sideEffects: {
-    passives: [{ property: "weaponEfficiency", value: 3.0, type: "factor" }]
+    statModifiers: [
+      { statName: "weaponEfficiency", value: 3.0, type: "factor" }
+    ]
   }
 });
 

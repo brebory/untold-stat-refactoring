@@ -1,14 +1,10 @@
+import { StatModifier } from "./internal";
+
 export interface Item {
   type: string;
   sideEffects?: {
-    passives: Passive[];
+    statModifiers: StatModifier[];
   };
   encumbrance?: number;
   armor?: number;
-}
-
-export interface Passive {
-  type: string;
-  property: string;
-  value: number;
 }
