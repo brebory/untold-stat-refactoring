@@ -1,5 +1,5 @@
 import { computed, observable, trace } from "mobx";
-import { Actor, Passive } from "./internal";
+import { Actor, StatModifier } from "./internal";
 
 export abstract class Stat {
   constructor(
@@ -29,9 +29,9 @@ export abstract class Stat {
     return value;
   }
 
-  @computed get filteredPassives(): Passive[] {
-    return this.actor.passives.filter(
-      (passive) => passive.property === this.name
+  @computed get filteredStatModifiers(): StatModifier[] {
+    return this.actor.statModifiers.filter(
+      (statModifier) => statModifier.statName === this.name
     );
   }
 
@@ -43,15 +43,21 @@ export abstract class Stat {
     return [
       // Term passives
       (value: number, stat: Stat) =>
-        stat.filteredPassives
-          .filter((passive) => passive.type === "term")
-          .reduce((value, passive) => value + passive.value, value),
+        stat.filteredStatModifiers
+          .filter((statModifier) => statModifier.type === "term")
+          .reduce(
+            (accumulation, statModifier) => accumulation + statModifier.value,
+            value
+          ),
 
       // Factor passives
       (value: number, stat: Stat) =>
-        stat.filteredPassives
-          .filter((passive) => passive.type === "factor")
-          .reduce((value, passive) => value * passive.value, value)
+        stat.filteredStatModifiers
+          .filter((statModifier) => statModifier.type === "factor")
+          .reduce(
+            (accumulation, statModifier) => accumulation * statModifier.value,
+            value
+          )
     ];
   }
 }

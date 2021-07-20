@@ -1,25 +1,25 @@
 import { observable, action, computed } from "mobx";
 
-import { Attribute, Derivative, Item } from "./internal";
+import { Attribute, Derivative, Item, StatModifier } from "./internal";
 
 export class Actor {
   @observable items: Item[] = [];
 
-  @computed get passives() {
-    return this.items.reduce((passives, item) => {
+  @computed get statModifiers(): StatModifier[] {
+    return this.items.reduce((statModifiers, item) => {
       if (
         item.sideEffects &&
-        item.sideEffects.passives &&
-        item.sideEffects.passives.length > 0
+        item.sideEffects.statModifiers &&
+        item.sideEffects.statModifiers.length > 0
       ) {
-        passives.push(...item.sideEffects.passives);
+        statModifiers.push(...item.sideEffects.statModifiers);
       }
 
-      return passives;
-    }, []);
+      return statModifiers;
+    }, [] as StatModifier[]);
   }
 
-  @action equipItem = (item) => {
+  @action equipItem = (item: Item) => {
     this.items.push(item);
   };
 
@@ -31,7 +31,7 @@ export class Actor {
     perception: new Attribute("perception", this)
   };
 
-  derivatives = {
+  derivatives: { [key: string]: Derivative } = {
     protection: new Derivative("protection", this, {
       expressions: [
         (_, derivative) => derivative.actor.attributes.resilience.value

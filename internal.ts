@@ -1,4 +1,4 @@
-export * from "./passive";
+export * from "./statModifier";
 export * from "./item";
 export * from "./stat";
 export * from "./actor";
