@@ -7,4 +7,17 @@ export interface Item {
   };
   encumbrance?: number;
   armor?: number;
+  attackSet?: ItemAttackSet;
+}
+
+export interface ItemAttack {
+  damage: Damage;
+  ranged: boolean;
+}
+
+export type ItemAttackSet = ItemAttack[];
+
+export interface Damage {
+  min: number;
+  max: number;
 }
