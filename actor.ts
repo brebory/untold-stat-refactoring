@@ -8,6 +8,7 @@ import {
   ChanceToBlock,
   Derivative,
   Item,
+  ItemAttackSet,  
   Protection,
   StatModifier,
   WeaponEfficiency
@@ -28,6 +29,19 @@ export class Actor {
 
       return statModifiers;
     }, [] as StatModifier[]);
+  }
+
+  @computed get attackSets(): ItemAttackSet {
+    return this.items.filter(item => item.type === "weapon")
+      .reduce((attackSets: ItemAttackSet, item: Item) => item.attackSet ? [...attackSets, ...item.attackSet] : attackSets, [])
+  }
+
+  @computed get meleeAttackSets(): ItemAttackSet {
+    return this.attackSets.filter(attack => !attack.ranged);
+  }
+
+  @computed get rangedAttackSets(): ItemAttackSet {
+    return this.attackSets.filter(attack => attack.ranged);
   }
 
   @action equipItem = (item: Item) => {

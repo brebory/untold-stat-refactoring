@@ -1,4 +1,4 @@
-import { StatModifier } from "./internal";
+import { StatModifier, ItemAttackSet } from "./internal";
 
 export interface Item {
   type: string;
@@ -8,16 +8,4 @@ export interface Item {
   encumbrance?: number;
   armor?: number;
   attackSet?: ItemAttackSet;
-}
-
-export interface ItemAttack {
-  damage: Damage;
-  ranged: boolean;
-}
-
-export type ItemAttackSet = ItemAttack[];
-
-export interface Damage {
-  min: number;
-  max: number;
 }
