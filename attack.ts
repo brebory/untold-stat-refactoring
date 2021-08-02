@@ -1,6 +1,6 @@
 export interface ItemAttack {
   damage: Damage;
-  ranged: boolean;
+  ranged?: boolean;
 }
 
 export interface Damage {

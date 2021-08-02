@@ -9,7 +9,9 @@ import {
   Derivative,
   Item,
   ItemAttackSet,
+  MeleeAttackPower,
   Protection,
+  RangedAttackPower,
   StatModifier,
   WeaponEfficiency,
   WeaponEncumbrance
@@ -69,7 +71,9 @@ export class Actor {
     armorEncumbrance: new ArmorEncumbrance(this),
     weaponEncumbrance: new WeaponEncumbrance(this),
     weaponEfficiency: new WeaponEfficiency(this),
-    attackSpeed: new AttackSpeed(this)
+    attackSpeed: new AttackSpeed(this),
+    meleeAttackPower: new MeleeAttackPower(this),
+    rangedAttackPower: new RangedAttackPower(this)
   };
 
   static armorItemTypes = ["armor", "shield"];

@@ -1,4 +1,5 @@
 export * from "./statModifier";
+export * from "./attack";
 export * from "./item";
 export * from "./stat";
 export * from "./actor";
@@ -8,6 +9,8 @@ export * from "./derivatives/armorEncumbrance";
 export * from "./derivatives/attackSpeed";
 export * from "./derivatives/chanceToBlock";
 export * from "./derivatives/chanceToDodge";
+export * from "./derivatives/meleeAttackPower";
 export * from "./derivatives/protection";
+export * from "./derivatives/rangedAttackPower";
 export * from "./derivatives/weaponEfficiency";
 export * from "./derivatives/weaponEncumbrance";

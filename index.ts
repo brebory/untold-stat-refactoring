@@ -39,7 +39,15 @@ console.log("Equipping Heavy Weapon (WENC +10)");
 
 person.equipItem({
   type: "weapon",
-  encumbrance: 10
+  encumbrance: 10,
+  attackSet: [
+    {
+      damage: {
+        min: 10,
+        max: 20
+      }
+    }
+  ]
 });
 
 console.log("###########################################");
