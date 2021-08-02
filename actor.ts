@@ -8,10 +8,11 @@ import {
   ChanceToBlock,
   Derivative,
   Item,
-  ItemAttackSet,  
+  ItemAttackSet,
   Protection,
   StatModifier,
-  WeaponEfficiency
+  WeaponEfficiency,
+  WeaponEncumbrance
 } from "./internal";
 
 export class Actor {
@@ -32,16 +33,21 @@ export class Actor {
   }
 
   @computed get attackSets(): ItemAttackSet {
-    return this.items.filter(item => item.type === "weapon")
-      .reduce((attackSets: ItemAttackSet, item: Item) => item.attackSet ? [...attackSets, ...item.attackSet] : attackSets, [])
+    return this.items
+      .filter((item) => item.type === "weapon")
+      .reduce(
+        (attackSets: ItemAttackSet, item: Item) =>
+          item.attackSet ? [...attackSets, ...item.attackSet] : attackSets,
+        []
+      );
   }
 
   @computed get meleeAttackSets(): ItemAttackSet {
-    return this.attackSets.filter(attack => !attack.ranged);
+    return this.attackSets.filter((attack) => !attack.ranged);
   }
 
   @computed get rangedAttackSets(): ItemAttackSet {
-    return this.attackSets.filter(attack => attack.ranged);
+    return this.attackSets.filter((attack) => attack.ranged);
   }
 
   @action equipItem = (item: Item) => {
@@ -61,14 +67,7 @@ export class Actor {
     chanceToDodge: new ChanceToDodge(this),
     chanceToBlock: new ChanceToBlock(this),
     armorEncumbrance: new ArmorEncumbrance(this),
-    weaponEncumbrance: new Derivative("weaponEncumbrance", this, {
-      expressions: [
-        (_, derivative) =>
-          derivative.actor.items
-            .filter(Actor.isItemWeaponType)
-            .reduce(Actor.encumbranceFromItems, 0)
-      ]
-    }),
+    weaponEncumbrance: new WeaponEncumbrance(this),
     weaponEfficiency: new WeaponEfficiency(this),
     attackSpeed: new AttackSpeed(this)
   };
