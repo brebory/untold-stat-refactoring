@@ -1,35 +1,21 @@
-import { action } from "mobx";
-
-import { Actor, Stat, ExpressionOptions } from "./internal";
+import { action, observable } from "mobx";
+import { Actor, ExpressionOptions, Stat } from "./internal";
 
 export class Attribute extends Stat {
-  constructor(
-    name: string,
-    actor: Actor,
-    baseValue: number = 1,
-    expressionOptions: ExpressionOptions<Attribute> = {}
-  ) {
-    super(name, actor, {
-      preExpressions: (expressionOptions.preExpressions || []).concat(
-        Attribute.defaultOptions.preExpressions
-      ),
-      expressions: (expressionOptions.expressions || []).concat(
-        Attribute.defaultOptions.expressions
-      ),
-      postExpressions: (expressionOptions.postExpressions || []).concat(
-        Attribute.defaultOptions.postExpressions
-      )
-    });
+  constructor(name: string, actor: Actor, baseValue: number = 1) {
+    super(name, actor, Attribute.defaultOptions);
     this.setBaseValue(baseValue);
   }
 
-  @action increaseBaseValue = () => this.baseValue++;
+  @observable baseValue = 0;
 
+  @action increaseBaseValue = () => this.baseValue++;
+  @action decreaseBaseValue = () => this.baseValue++;
   @action setBaseValue = (value) => (this.baseValue = value);
 
   static get defaultOptions(): ExpressionOptions<Attribute> {
     return {
-      preExpressions: [],
+      preExpressions: [(_, attribute: Attribute) => attribute.baseValue],
       expressions: [],
       postExpressions: [
         // Floor

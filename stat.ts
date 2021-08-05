@@ -1,5 +1,16 @@
-import { computed, observable, trace } from "mobx";
+import { computed, trace } from "mobx";
 import { Actor, StatModifier } from "./internal";
+
+export type StatExpression<StatContext extends Stat = any> = (
+  value: number,
+  context: StatContext
+) => number;
+
+export type ExpressionOptions<StatContext extends Stat = any> = {
+  preExpressions?: StatExpression<StatContext>[];
+  expressions?: StatExpression<StatContext>[];
+  postExpressions?: StatExpression<StatContext>[];
+};
 
 export abstract class Stat {
   constructor(
@@ -16,14 +27,12 @@ export abstract class Stat {
 
   public readonly expressions: StatExpression[];
 
-  @observable baseValue = 0;
-
   @computed get value() {
     trace();
 
     const value = this.expressions.reduce(
       (value, expression) => expression(value, this),
-      this.baseValue
+      0
     );
 
     return value;
@@ -61,14 +70,3 @@ export abstract class Stat {
     ];
   }
 }
-
-export type StatExpression<StatContext extends Stat = any> = (
-  value: number,
-  context: StatContext
-) => number;
-
-export type ExpressionOptions<StatContext extends Stat = any> = {
-  preExpressions?: StatExpression<StatContext>[];
-  expressions?: StatExpression<StatContext>[];
-  postExpressions?: StatExpression<StatContext>[];
-};

@@ -1,6 +1,21 @@
 import { observable, action, computed } from "mobx";
 
-import { Attribute, Derivative, Item, StatModifier } from "./internal";
+import {
+  Attribute,
+  ArmorEncumbrance,
+  AttackSpeed,
+  ChanceToDodge,
+  ChanceToBlock,
+  Derivative,
+  Item,
+  ItemAttackSet,
+  MeleeAttackPower,
+  Protection,
+  RangedAttackPower,
+  StatModifier,
+  WeaponEfficiency,
+  WeaponEncumbrance
+} from "./internal";
 
 export class Actor {
   @observable items: Item[] = [];
@@ -19,6 +34,24 @@ export class Actor {
     }, [] as StatModifier[]);
   }
 
+  @computed get attackSets(): ItemAttackSet {
+    return this.items
+      .filter((item) => item.type === "weapon")
+      .reduce(
+        (attackSets: ItemAttackSet, item: Item) =>
+          item.attackSet ? [...attackSets, ...item.attackSet] : attackSets,
+        []
+      );
+  }
+
+  @computed get meleeAttackSets(): ItemAttackSet {
+    return this.attackSets.filter((attack) => !attack.ranged);
+  }
+
+  @computed get rangedAttackSets(): ItemAttackSet {
+    return this.attackSets.filter((attack) => attack.ranged);
+  }
+
   @action equipItem = (item: Item) => {
     this.items.push(item);
   };
@@ -32,71 +65,15 @@ export class Actor {
   };
 
   derivatives: { [key: string]: Derivative } = {
-    protection: new Derivative("protection", this, {
-      expressions: [
-        (_, derivative) => derivative.actor.attributes.resilience.value
-      ]
-    }),
-    chanceToDodge: new Derivative("chanceToDodge", this, {
-      expressions: [
-        (_, derivative) => derivative.actor.attributes.agility.value,
-        (value, _) => value / 100
-      ],
-      postExpressions: [(value, _) => Math.min(value, 0.5)]
-    }),
-    chanceToBlock: new Derivative("chanceToBlock", this, {
-      expressions: [
-        (_, derivative) => derivative.actor.attributes.resilience.value,
-        (value, _) => value / 10
-      ],
-      postExpressions: [(value, _) => Math.min(value, 0.8)]
-    }),
-    armorEncumbrance: new Derivative("armorEncumbrance", this, {
-      expressions: [
-        (_, derivative) =>
-          derivative.actor.items
-            .filter(Actor.isItemArmorType)
-            .reduce(Actor.encumbranceFromItems, 0)
-      ]
-    }),
-    weaponEncumbrance: new Derivative("weaponEncumbrance", this, {
-      expressions: [
-        (_, derivative) =>
-          derivative.actor.items
-            .filter(Actor.isItemWeaponType)
-            .reduce(Actor.encumbranceFromItems, 0)
-      ]
-    }),
-    weaponEfficiency: new Derivative("weaponEfficiency", this, {
-      expressions: [
-        (_, derivative) => {
-          const {
-            weaponEncumbrance,
-            armorEncumbrance
-          } = derivative.actor.derivatives;
-          const { strength } = derivative.actor.attributes;
-
-          const weaponValue = weaponEncumbrance.value;
-          const armorValue = armorEncumbrance.value;
-          const strengthValue = strength.value;
-
-          if (weaponValue > 0 || armorValue > 0) {
-            return (2 + strengthValue) / (weaponValue + armorValue / 4);
-          } else {
-            return 1;
-          }
-        }
-      ],
-      postExpressions: [(value, _) => Math.min(value, 1)]
-    }),
-    attackSpeed: new Derivative("attackSpeed", this, {
-      expressions: [
-        (_, derivative) => 1.1 + derivative.actor.attributes.agility.value / 6,
-        (value, derivative) =>
-          value * derivative.actor.derivatives.weaponEfficiency.value
-      ],
-      postExpressions: [(value, _) => Math.max(value, 0)]
-    })
+    protection: new Protection(this),
+    chanceToDodge: new ChanceToDodge(this),
+    chanceToBlock: new ChanceToBlock(this),
+    armorEncumbrance: new ArmorEncumbrance(this),
+    weaponEncumbrance: new WeaponEncumbrance(this),
+    weaponEfficiency: new WeaponEfficiency(this),
+    attackSpeed: new AttackSpeed(this),
+    meleeAttackPower: new MeleeAttackPower(this),
+    rangedAttackPower: new RangedAttackPower(this)
   };
 
   static armorItemTypes = ["armor", "shield"];
